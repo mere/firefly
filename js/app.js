@@ -37,7 +37,7 @@ define(["d3", "./firefly"], function(d3, f){
       
       var firefly = f()
       firefly.node = node
-      firefly.num = Math.random()
+      firefly.type = Math.random()
       firefly.x = Math.random()*f.stageWidth
       firefly.y = Math.random()*f.stageHeight
       firefly.dx = Math.random()*6-3
