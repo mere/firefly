@@ -1,0 +1,13 @@
+.stage{
+	width:600px;
+	height:600px;
+	border: 1px solid #334455;
+	position: relative;
+}
+
+.firefly{
+	position: absolute;
+	width:10px;
+	height:10px;
+	background-color: #334455;
+}

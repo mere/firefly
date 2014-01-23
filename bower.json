@@ -1,0 +1,12 @@
+{
+  "name": "Firefly",
+  "version": "1.0.0",
+  "directory": "lib/",
+  "dependencies": {
+    "jquery": "1.9",
+    "d3": null,
+    "underscore": null,
+    "requirejs": null,
+    "normalize-css": null
+  }
+}
