@@ -9,12 +9,18 @@ define([], function(){
     instance.y = 0
     instance.w = 10
     instance.h = 10
-    instance.dx = 0
-    instance.dy = 0
+    instance.direction = 0 //0..2PI radian angle
+    instance.desiredDirection = 0 //0..2PI radian angle
+    instance.velocity = 0
+    instance.desiredVelocity = 0
+
+    instance.turningSpeed = .5 // 0..1 slow turn to turn instantly
+    instance.acceleration = .5 // 0..1 how fast can the desired speed be achieved
+    
     instance.mood = 0 // -1..1: unhappy to happy
     instance.sight = 100 //px: how far can they see?
-    instance.attraction = .01 //px
-    instance.repellence = 1 //px
+    instance.attractionWeight = 1 //0..1
+    instance.repellenceWeight = 1 //0..1
     instance.maxSpeed = 1 //px
     instance.comfortZone = 30 //px: move away from other fireflies that are too close
     instance.id = mob.length
@@ -22,37 +28,65 @@ define([], function(){
     instance.bounce = 1 //px
     instance.dampening = 0.92 //0..1: instant stop to slow speed decrease
     // soduku specific:
-    instance.num = 0
+    instance.type = 0
     
     /**
      *  calculate the next move
      */
     instance.tick = function(){
-      i.dx *= i.dampening
-      i.dy *= i.dampening
-      // calculate interaction with other fireflies
-      mob.forEach(function(f){
-        if (f==i) return
-        
-        var d = i.distanceTo(f.x, f.y)
-        if (d<i.comfortZone) convergeTo(f.x, f.y, -i.repellence)
-        else if (d<i.sight) convergeTo(f.x, f.y, (f.num==i.num)? -i.repellence : i.attraction)
-      })
-
-      var speedRatio = i.maxSpeed/Math.sqrt(i.dx*i.dx+i.dy*i.dy)
+      i.velocity *= i.dampening
       
-      if (speedRatio<1) {
-        i.dx *= speedRatio
-        i.dy *= speedRatio
-        //console.log(speedRatio, i.dx, i.dy)
-      } 
-      i.x += i.dx
-      i.y += i.dy
+      var desiredPoint = interact()
+      i.desiredDirection = point2Direction(desiredPoint)
+      i.desiredVelocity = Math.min(i.maxSpeed, i.distanceTo(desiredPoint.x, desiredPoint.y))
+
+      //calculate new direction and velocity
+      i.velocity = (i.desiredVelocity-i.velocity)
 
       if (i.x<0) { i.x=0; i.dx = i.bounce}
       if (i.y<0) { i.y=0; i.dy = i.bounce}
       if (i.x>factory.stageWidth-i.w) { i.x=factory.stageWidth-i.w; i.dx = -i.bounce}
       if (i.y>factory.stageHeight-i.h) { i.y=factory.stageHeight-i.h; i.dy = -i.bounce}
+    }
+
+    function point2Direction(point){
+      return Math.atan2(point.y,point.x)
+    }
+    // calculate interaction with other fireflies
+    function interact(){
+      var attractX=0, attractY=0, attractionWeights=0, num
+      var repelX=0, repelY=0, repellenceWeights=0
+
+      mob.forEach(function(f){
+        if (f==i) return
+        
+        var d = i.distanceTo(f.x, f.y)
+        var weight
+        if (d<i.sight) {
+          if (d<i.comfortZone || f.type==i.type){
+            w = i.repellenceWeight * (d/i.comfortZone)
+            repelX += f.x*weight
+            repelY += f.y*weight
+            repellenceWeights += weight
+          }
+          else {
+            attractX += f.x*i.attractionWeight
+            attractY += f.y*i.attractionWeight
+            attractionWeights += i.attractionWeight 
+          }
+        }
+      })
+      repelX /= repellenceWeights
+      repelY /= repellenceWeights
+      var repelTargetX = (i.x*2-repelX)
+      var repelTargetY = (i.y*2-repelY)
+
+      attractX /= attractionWeights
+      attractY /= attractionWeights
+
+      var targetX = (repelTargetX +attractX)/2
+      var targetY = (repelTargetY +attractY)/2
+      return { x:targetX, y:targetY }
     }
 
     /**
