@@ -15,9 +15,12 @@ define(["d3", "./firefly"], function(d3, f){
         stage.classed("show-direction", !stage.classed("show-direction"))
       })  
 
-    for (var i=0;i<22;i++) add()
+    for (var i=0;i<50;i++) add()
 
-    setInterval(tick, 1)
+    setInterval(function(){
+      tick()
+      tick()
+    }, 1)
     animFrame(render)
 
     function tick(){
@@ -31,8 +34,8 @@ define(["d3", "./firefly"], function(d3, f){
         firefly.dom.node
           .attr("transform", "translate(" + firefly.x + "," + firefly.y + ")");
         firefly.dom.direction
-          .attr("x2", firefly.aimX*30)
-          .attr("y2", firefly.aimY*30)
+          .attr("x2", firefly.aimX*100)
+          .attr("y2", firefly.aimY*100)
 
       })
       animFrame(render)

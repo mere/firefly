@@ -21,13 +21,13 @@ define([], function(){
     instance.velocity = 0
     instance.desiredVelocity = 0
 
-    instance.turningSpeed = .05 // 0..1 slow turn to turn instantly
+    instance.turningSpeed = .01 // 0..1 slow turn to turn instantly
     instance.acceleration = .0005 // 0..1 how fast can the desired speed be achieved
     
     instance.mood = 0 // -1..1: unhappy to happy
     instance.sight = 100 //px: how far can they see?
     instance.attractionWeight = .05 //0..1
-    instance.repellenceWeight = 1 //0..1
+    instance.repellenceWeight = .3 //0..1
     instance.maxSpeed = 1 //px
     instance.comfortZone = 30 //px: move away from other fireflies that are too close
     instance.id = mob.length
@@ -60,7 +60,7 @@ define([], function(){
         if (theta<-180) theta += 360
         i.direction = i.direction + theta*i.turningSpeed  
 
-        var acceleration = i.acceleration* (1-(theta/180))
+        var acceleration = i.acceleration* (1-(Math.abs(theta)/180))
 
         i.velocity = Math.min(i.maxSpeed, i.velocity + (i.desiredVelocity-i.velocity)*acceleration)
       }
@@ -109,15 +109,16 @@ define([], function(){
         var weight
         if (d<i.sight) {
           if (d<i.comfortZone || f.type==i.type){
-            weight = (d/i.comfortZone)
+            weight = 1-(d/i.comfortZone)
             repelX += f.x*weight
             repelY += f.y*weight
             repellenceWeights += weight
           }
           else {
-            attractX += f.x
-            attractY += f.y
-            attractionWeights += 1
+            weight = ((d-i.comfortZone)/(i.sight-i.comfortZone))
+            attractX += f.x*weight
+            attractY += f.y*weight
+            attractionWeights += weight
           }
         }
       })
