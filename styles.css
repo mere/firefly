@@ -11,3 +11,12 @@
 	height:10px;
 	background-color: #334455;
 }
+
+.direction{
+	display:none;
+	stroke: black;
+}
+
+.show-direction .direction{
+	display:block;
+}

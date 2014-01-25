@@ -1,7 +1,7 @@
 define([], function(){
   
   var mob = []
-  function factory(node){
+  function factory(){
     var i, instance = i = {}
     mob.push(instance)
 
@@ -9,24 +9,31 @@ define([], function(){
     instance.y = 0
     instance.w = 10
     instance.h = 10
-    instance.direction = 0 //0..2PI radian angle
-    instance.desiredDirection = 0 //0..2PI radian angle
+
+    // read only
+    instance.desiredX = 0;
+    instance.desiredY = 0;
+    instance.aimX = 0;
+    instance.aimY = 0;
+
+    instance.direction = 0 //0..360 degrees
+    instance.desiredDirection = 0 //0..360degrees
     instance.velocity = 0
     instance.desiredVelocity = 0
 
-    instance.turningSpeed = .5 // 0..1 slow turn to turn instantly
-    instance.acceleration = .5 // 0..1 how fast can the desired speed be achieved
+    instance.turningSpeed = .05 // 0..1 slow turn to turn instantly
+    instance.acceleration = .0005 // 0..1 how fast can the desired speed be achieved
     
     instance.mood = 0 // -1..1: unhappy to happy
     instance.sight = 100 //px: how far can they see?
-    instance.attractionWeight = 1 //0..1
+    instance.attractionWeight = .05 //0..1
     instance.repellenceWeight = 1 //0..1
     instance.maxSpeed = 1 //px
     instance.comfortZone = 30 //px: move away from other fireflies that are too close
     instance.id = mob.length
-    instance.node = node
+    instance.dom = {}
     instance.bounce = 1 //px
-    instance.dampening = 0.92 //0..1: instant stop to slow speed decrease
+    instance.dampening = 0.99 //0..1: instant stop to slow speed decrease
     // soduku specific:
     instance.type = 0
     
@@ -36,21 +43,58 @@ define([], function(){
     instance.tick = function(){
       i.velocity *= i.dampening
       
+      i.desiredX = i.x;
+      i.desiredY = i.y;
       var desiredPoint = interact()
-      i.desiredDirection = point2Direction(desiredPoint)
-      i.desiredVelocity = Math.min(i.maxSpeed, i.distanceTo(desiredPoint.x, desiredPoint.y))
 
-      //calculate new direction and velocity
-      i.velocity = (i.desiredVelocity-i.velocity)
+      if (desiredPoint) {
+        i.desiredX = desiredPoint.x;
+        i.desiredY = desiredPoint.y;
 
-      if (i.x<0) { i.x=0; i.dx = i.bounce}
-      if (i.y<0) { i.y=0; i.dy = i.bounce}
-      if (i.x>factory.stageWidth-i.w) { i.x=factory.stageWidth-i.w; i.dx = -i.bounce}
-      if (i.y>factory.stageHeight-i.h) { i.y=factory.stageHeight-i.h; i.dy = -i.bounce}
+        i.desiredDirection = point2Direction(desiredPoint)
+        i.desiredVelocity = i.distanceTo(desiredPoint.x, desiredPoint.y)
+        //console.log("i.desiredVelocity",i.desiredVelocity)
+        //calculate new direction and velocity
+        var theta = (i.desiredDirection-i.direction)
+        if (theta>180) theta -= 360
+        if (theta<-180) theta += 360
+        i.direction = i.direction + theta*i.turningSpeed  
+
+        var acceleration = i.acceleration* (1-(theta/180))
+
+        i.velocity = Math.min(i.maxSpeed, i.velocity + (i.desiredVelocity-i.velocity)*acceleration)
+      }
+
+      
+      //console.log("dir", i.direction, i.desiredDirection, desiredPoint)
+      
+      // bounce off walls
+      if (i.x<0) { i.x=0; i.direction = 180-i.direction}
+      if (i.y<0) { i.y=0; i.direction = 360-i.direction}
+      if (i.x>factory.stageWidth-i.w) { 
+        i.x=factory.stageWidth-i.w; 
+        i.direction = 180-i.direction
+      }
+      if (i.y>factory.stageHeight-i.h) { 
+        i.y=factory.stageHeight-i.h; 
+        i.direction = 360-i.direction}
+
+      if (i.direction<0) i.direction+=360
+
+      // calculate new point
+      var r = degree2radian(i.direction)
+      i.aimX = i.velocity * Math.cos(r)
+      i.aimY = i.velocity * Math.sin(r)
+      i.x += i.aimX;
+      i.y += i.aimY;
+      
     }
 
+    function radian2degree(r) {return r * 57.295779513082}
+    function degree2radian(d) {return d * 0.017453292519}
+
     function point2Direction(point){
-      return Math.atan2(point.y,point.x)
+      return radian2degree(Math.atan2(point.y-i.y,point.x-i.x))
     }
     // calculate interaction with other fireflies
     function interact(){
@@ -59,34 +103,42 @@ define([], function(){
 
       mob.forEach(function(f){
         if (f==i) return
+
         
         var d = i.distanceTo(f.x, f.y)
         var weight
         if (d<i.sight) {
           if (d<i.comfortZone || f.type==i.type){
-            w = i.repellenceWeight * (d/i.comfortZone)
+            weight = (d/i.comfortZone)
             repelX += f.x*weight
             repelY += f.y*weight
             repellenceWeights += weight
           }
           else {
-            attractX += f.x*i.attractionWeight
-            attractY += f.y*i.attractionWeight
-            attractionWeights += i.attractionWeight 
+            attractX += f.x
+            attractY += f.y
+            attractionWeights += 1
           }
         }
       })
+
       repelX /= repellenceWeights
       repelY /= repellenceWeights
-      var repelTargetX = (i.x*2-repelX)
-      var repelTargetY = (i.y*2-repelY)
+      var repelTargetX = i.x+(i.x-repelX)*i.repellenceWeight
+      var repelTargetY = i.y+(i.y-repelY)*i.repellenceWeight
 
       attractX /= attractionWeights
       attractY /= attractionWeights
+      var attractTargetX = i.x+(attractX-i.x)*i.attractionWeight
+      var attractTargetY = i.y+(attractY-i.y)*i.attractionWeight
 
-      var targetX = (repelTargetX +attractX)/2
-      var targetY = (repelTargetY +attractY)/2
-      return { x:targetX, y:targetY }
+      if (repellenceWeights && attractionWeights) {
+        return { x:(repelTargetX +attractTargetX)/2, y:(repelTargetY +attractTargetY)/2 }
+      }
+      else if (repellenceWeights) return { x:repelTargetX, y:repelTargetY  }
+      else if (attractionWeights) return { x:attractTargetX, y:attractTargetY  }
+      return null
+      
     }
 
     /**
