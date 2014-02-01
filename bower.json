@@ -5,6 +5,8 @@
   "dependencies": {
     "jquery": "1.9",
     "d3": null,
+    "KineticJS": "https://github.com/ericdrowell/KineticJS.git",
+    "threejs": null,
     "underscore": null,
     "requirejs": null,
     "normalize-css": null

@@ -12,8 +12,9 @@
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
         <link rel="stylesheet" href="lib/normalize-css/normalize.css">
         <link rel="stylesheet" href="styles.css">
-        <script data-main="js/main" src="lib/jquery/jquery.min.js"></script>
-        <script data-main="js/main" src="lib/d3/d3.min.js"></script>
+        <script src="lib/jquery/jquery.min.js"></script>
+        <script src="lib/d3/d3.min.js"></script>
+        <script src="lib/Kineticjs/kinetic.js"></script>
         <script data-main="js/main" src="lib/requirejs/require.js"></script>
     </head>
     <body>
@@ -21,23 +22,7 @@
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
        
-    <div >
-     <svg class="stage">
-      <defs>
-        <filter id="glow">
-          <feColorMatrix type="matrix" values=
-             "0 0 0 1 0
-              0 0 0 .5 0
-              0 0 0 0 0
-              0 0 0 1   0"/>
-          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-     </svg>
+    <div id="stage">
     </div>
     <button class="show-direction">show pivots</button>
     </body>

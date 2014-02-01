@@ -2,9 +2,7 @@ require.config({
 
     paths: {
         "jquery": ["http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min",
-                    "libs/jquery/jquery"],
-        "underscore": "libs/underscore/underscore-min",
-        "backbone": "libs/backbone/backbone-min"
+                    "libs/jquery/jquery"]        
     },
 
     shim: { },
@@ -12,6 +10,9 @@ require.config({
 });
 
 define("d3", [], function(){return d3})
-require(['./app'], function(app){
-    app()
+define("kinetic", [], function(){return Kinetic})
+define("three", [], function(){return THREE})
+
+require(['./mainapp'], function(app){
+    
 });
