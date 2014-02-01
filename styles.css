@@ -1,5 +1,20 @@
 body {
-	background-color: #000000;
+	height: 100%
+  background: #202a2e;
+  background-image: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      color-stop(0, rgb(10, 12, 14)),
+      color-stop(1, rgb(6, 38, 51))
+  );
+  background-image: -moz-linear-gradient(
+      center bottom,
+      rgb(10, 12, 14) 0%,
+      rgb(6, 38, 51) 100%
+  );
+  background-attachment: fixed !important;
+
 }
 .stage{
 	background-color: #111133;
