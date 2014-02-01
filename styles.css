@@ -1,4 +1,8 @@
+body {
+	background-color: #000000;
+}
 .stage{
+	background-color: #111133;
 	width:600px;
 	height:600px;
 	border: 1px solid #334455;
@@ -7,9 +11,12 @@
 
 .firefly{
 	position: absolute;
-	width:10px;
-	height:10px;
-	background-color: #334455;
+	
+	fill: #ffdd22;
+}
+
+.firefly text{
+	text-anchor: middle; 
 }
 
 .direction{

@@ -7,8 +7,8 @@ define([], function(){
 
     instance.x = 0
     instance.y = 0
-    instance.w = 10
-    instance.h = 10
+    instance.w = 20
+    instance.h = 20
 
     // read only
     instance.desiredX = 0;
@@ -24,19 +24,33 @@ define([], function(){
     instance.turningSpeed = .01 // 0..1 slow turn to turn instantly
     instance.acceleration = .0005 // 0..1 how fast can the desired speed be achieved
     
-    instance.mood = 0 // -1..1: unhappy to happy
-    instance.sight = 100 //px: how far can they see?
+    instance.fieldOfVision = 150 //px: how far can they see?
     instance.attractionWeight = .05 //0..1
-    instance.repellenceWeight = .3 //0..1
     instance.maxSpeed = 1 //px
-    instance.comfortZone = 30 //px: move away from other fireflies that are too close
+    instance.dampening = 0.99 //0..1: instant stop to slow speed decrease
+    
     instance.id = mob.length
     instance.dom = {}
-    instance.bounce = 1 //px
-    instance.dampening = 0.99 //0..1: instant stop to slow speed decrease
     // soduku specific:
     instance.type = 0
     
+    instance.attraction1 = function(me, you, distance){
+      if (me.type == you.type) return -1
+      if (distance< 50) return -.2
+      return 0.001
+    }
+
+    // sort
+    instance.attraction = function(me, you, distance){
+      var d = Math.abs(me.type - you.type)
+      
+      if (d == 0) return 1
+      if (distance< 30) return -.5
+      if (d == 1) return .5
+      if (distance< 60) return -.1
+      return 0.00001
+    }
+
     /**
      *  calculate the next move
      */
@@ -99,45 +113,30 @@ define([], function(){
     // calculate interaction with other fireflies
     function interact(){
       var attractX=0, attractY=0, attractionWeights=0, num
-      var repelX=0, repelY=0, repellenceWeights=0
-
       mob.forEach(function(f){
         if (f==i) return
-
-        
         var d = i.distanceTo(f.x, f.y)
-        var weight
-        if (d<i.sight) {
-          if (d<i.comfortZone || f.type==i.type){
-            weight = 1-(d/i.comfortZone)
-            repelX += f.x*weight
-            repelY += f.y*weight
-            repellenceWeights += weight
-          }
-          else {
-            weight = ((d-i.comfortZone)/(i.sight-i.comfortZone))
-            attractX += f.x*weight
-            attractY += f.y*weight
-            attractionWeights += weight
-          }
+      
+        if (d<i.fieldOfVision) {
+          var attractionRate = i.attraction(i,f,d)
+            , multiplier = (attractionRate>0)?(d/i.fieldOfVision):(1-(d/i.fieldOfVision))
+            , absRate = Math.abs(attractionRate) * multiplier
+            
+            x = (attractionRate>0)? f.x: (i.x*2-f.x)
+            y = (attractionRate>0)? f.y: (i.y*2-f.y)
+          attractX += x*absRate
+          attractY += y*absRate
+          attractionWeights += absRate
+        
         }
       })
-
-      repelX /= repellenceWeights
-      repelY /= repellenceWeights
-      var repelTargetX = i.x+(i.x-repelX)*i.repellenceWeight
-      var repelTargetY = i.y+(i.y-repelY)*i.repellenceWeight
 
       attractX /= attractionWeights
       attractY /= attractionWeights
       var attractTargetX = i.x+(attractX-i.x)*i.attractionWeight
       var attractTargetY = i.y+(attractY-i.y)*i.attractionWeight
 
-      if (repellenceWeights && attractionWeights) {
-        return { x:(repelTargetX +attractTargetX)/2, y:(repelTargetY +attractTargetY)/2 }
-      }
-      else if (repellenceWeights) return { x:repelTargetX, y:repelTargetY  }
-      else if (attractionWeights) return { x:attractTargetX, y:attractTargetY  }
+      if (attractionWeights) return { x:attractTargetX, y:attractTargetY  }
       return null
       
     }

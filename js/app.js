@@ -1,4 +1,7 @@
-define(["d3", "./firefly"], function(d3, f){
+define(["d3", 
+  "./firefly"
+
+  ], function(d3, f){
   return function(){
     var animFrame = window.requestAnimationFrame 
       || window.mozRequestAnimationFrame 
@@ -6,18 +9,20 @@ define(["d3", "./firefly"], function(d3, f){
       || window.msRequestAnimationFrame;
 
     var stage = d3.select(".stage")
-      .append("svg")
       .attr("width", f.stageWidth)
-      .attr("height", f.stageHeight);
+      .attr("height", f.stageHeight)
+
     
     d3.select(".show-direction")
       .on("click", function(){
         stage.classed("show-direction", !stage.classed("show-direction"))
       })  
 
-    for (var i=0;i<50;i++) add()
+    for (var i=0;i<50;i++) add(i)
 
     setInterval(function(){
+      tick()
+      tick()
       tick()
       tick()
     }, 1)
@@ -36,16 +41,15 @@ define(["d3", "./firefly"], function(d3, f){
         firefly.dom.direction
           .attr("x2", firefly.aimX*100)
           .attr("y2", firefly.aimY*100)
-
       })
       animFrame(render)
 
     }
 
-    function add(){
+    function add(i){
       var firefly = f()
       
-      firefly.type = Math.random()
+      firefly.type = i
       firefly.x = Math.random()*f.stageWidth
       firefly.y = Math.random()*f.stageHeight
       firefly.direction = Math.random()*360
@@ -53,11 +57,12 @@ define(["d3", "./firefly"], function(d3, f){
       firefly.color = "green"
 
       firefly.dom.node = stage.append("g")
+        
 
       firefly.dom.node
         .append("circle")
         .attr("r", firefly.w/2 )
-        .style("fill", firefly.color)
+        //.style("fill", firefly.color)
         .classed("firefly", true)
 
       firefly.dom.direction = 
@@ -68,6 +73,15 @@ define(["d3", "./firefly"], function(d3, f){
         .attr("y1", 0)
         .attr("x2", 100)
         .attr("y2", 0)
+
+      firefly.dom.text = 
+        firefly.dom.node
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("x", 0)
+        .attr("y", 5)
+        .attr("w", 10)
+        .text(firefly.type)
     }
 
   }
