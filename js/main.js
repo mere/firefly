@@ -13,6 +13,6 @@ define("d3", [], function(){return d3})
 define("kinetic", [], function(){return Kinetic})
 define("three", [], function(){return THREE})
 
-require(['./mainapp'], function(app){
+require(['app'], function(app){
     
 });

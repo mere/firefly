@@ -15,32 +15,25 @@
     <script src="lib/threejs/build/three.js"></script>
     <!--<script src="js/stats.js"></script>-->
     <script src="js/controls/OrbitControls.js"></script>
-
     <script data-main="js/main" src="lib/requirejs/require.js"></script>
     <script type="text/javascript">
       define("app", ["environment","swarm"], function(env,swarm){
-        env.flat = false
+        env.flat = true
         env.mouseForce = -.1
         env.wallRepelForce = 5
 
         swarm
           .onCreate(function(f,n){
-            var variants = 4
-            f.type = n%variants
-            var hue = f.type/variants
-            f.mesh.material.specular = new THREE.Color("#ff0000").offsetHSL(hue,0,0)
-            f.mesh.material.color = new THREE.Color("#ff0000").offsetHSL(hue,0,-.1)
-            f.mesh.material.emissive = new THREE.Color("#ff0000").offsetHSL(hue,0,-.3)
-            f.fieldOfVision = 200
-            f.maxSpeed = 2
-            f.maxSteerForce = .01
+            f.mesh.material.specular = new THREE.Color("#ff0000").offsetHSL(n/100,0,0)
+            f.mesh.material.color = new THREE.Color("#ff0000").offsetHSL(n/100,0,-.1)
+            f.mesh.material.emissive = new THREE.Color("#ff0000").offsetHSL(n/100,0,-.3)
+            f.type = n
+            f.fieldOfVision = 400
           })
           .interact(function(me, you, distance){
-            if (distance< 50) return -(1-(distance/50))*15
-            if (me.type==you.type) return .05
-            if (distance< 200 && me.type!=you.type) return -.1
-            
-            return 0.001
+            if (distance< 40) return -(1-(distance/40))*5
+            if (distance< 100) return .01
+            return 0
           })
           
           .add(100)
