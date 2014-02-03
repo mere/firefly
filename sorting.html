@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -29,6 +28,7 @@
             f.mesh.material.emissive = new THREE.Color("#ff0000").offsetHSL(n/100,0,-.3)
             f.type = n
             f.fieldOfVision = 400
+            f.maxSpeed = 2
           })
           .interact(function(me, you, distance){
             var d = Math.abs((me.type%100)- (you.type%100))
