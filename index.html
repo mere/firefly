@@ -21,7 +21,7 @@
         env.flat = false
         env.mouseForce = -.1
         env.wallRepelForce = 5
-
+        try {
         swarm
           .onCreate(function(f,n){
             var variants = 4
@@ -41,9 +41,8 @@
             
             return 0.001
           })
-          
           .add(100)
-
+        } catch(e){console.error(e)}
       })
     </script>
   </head>
