@@ -30,23 +30,11 @@ define([
   var color = new THREE.Color("#ffff00").offsetHSL(0,0,-.1)
   var emissive = new THREE.Color("#ffff00").offsetHSL(0,0,-.5)
   i.mesh = new THREE.Mesh( 
-        //new obj()
-        //new THREE.SphereGeometry(10, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
-        new THREE.SphereGeometry(20, 5, 5)
-      // , new THREE.MeshBasicMaterial( 
-      //   { 
-      //     color: Math.random() * 0xffffff, 
-      //     side: THREE.DoubleSide 
-      //   }) 
-      ,new THREE.MeshPhongMaterial({
-        // light
-        specular: specular,
-        // intermediate
-        color: color,
-        // dark
-        emissive: emissive,
-        shininess: 10 
-      })
+       new THREE.Geometry()
+      ,new THREE.ParticleBasicMaterial({
+         color: 0xFFFFFF,
+         size: 20
+       })
       )
 
   i.goal = function(value){
