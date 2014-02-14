@@ -29,13 +29,10 @@ define([
   var specular = new THREE.Color("#ffff00")
   var color = new THREE.Color("#ffff00").offsetHSL(0,0,-.1)
   var emissive = new THREE.Color("#ffff00").offsetHSL(0,0,-.5)
-  i.mesh = new THREE.Mesh( 
-       new THREE.Geometry()
-      ,new THREE.ParticleBasicMaterial({
-         color: 0xFFFFFF,
-         size: 20
-       })
-      )
+  
+
+  i.color = new THREE.Color(0xffffff*Math.random())
+  i.renderedColor = new THREE.Color(0xffffff)
 
   i.goal = function(value){
     if (!arguments.length) return goal

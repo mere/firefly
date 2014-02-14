@@ -16,20 +16,22 @@ define(
     var stats
 
     updateScreenSize()
-  init();
+    
+      init();
+
     animate();
 
     function updateScreenSize(){
-      environment.width = window.innerWidth
-      environment.height = window.innerHeight
-      environment.depth = 200
+      environment.width = 600//window.innerWidth
+      environment.height = 600//window.innerHeight
+      environment.depth = 500
     }
 
     function init() {
       swarm = []
 
       camera = new THREE.PerspectiveCamera( 75, environment.width / environment.height, 1, 10000 )
-      camera.position.z = environment.depth*3 * environment.width / environment.height
+      camera.position.z = 800
       
       var controls = new THREE.OrbitControls( camera );
 
@@ -61,7 +63,7 @@ define(
         document.getElementById( 'container' ).appendChild(stats.domElement);
       }
   
-      window.addEventListener( 'resize', onWindowResize, false );
+      //window.addEventListener( 'resize', onWindowResize, false );
     }
 
     function onWindowResize() {
@@ -83,15 +85,12 @@ define(
 
       swarm.forEach(function(f){
         f.tick( swarm , interact);
-        //f.position.copy(mouse.light.position)
-        //f.mesh.rotation.y = Math.atan2( - f.velocity.z, f.velocity.x );
-        //f.mesh.rotation.z = Math.asin( f.velocity.y / f.velocity.length() );
-
+        
         if (!environment.flat) {
-          var color = f.mesh.material.color;
+          var color = f.color;
           var hsl = color.getHSL()
           var s = ( environment.width/2 + f.position.z ) / environment.width
-          color.setHSL(hsl.h, s, s)
+          f.renderedColor.setHSL(hsl.h, hsl.s, hsl.l)
         }
       })
       
@@ -101,17 +100,34 @@ define(
     var instance = {}
       , onCreate
       , interact
-
+    var particles = new THREE.Geometry;
+    var particleSystem
+    var material = new THREE.ParticleBasicMaterial({
+      color: 0xFFFFFF,
+      size: 10,
+      vertexColors: true,
+      //map: THREE.ImageUtils.loadTexture(
+      //       "../images/particle.png"
+      //)
+      blending: THREE.AdditiveBlending,
+      transparent: true
+    })
     instance.add = function(num){
       for ( var n = 0; n < num; n ++ ) {
         var firefly = create(n)
         swarm[n] = firefly
-        scene.add( firefly.mesh );
       }
+      particles.colors = swarm.map(function(f){ return f.renderedColor})
+      particleSystem = new THREE.ParticleSystem(particles, material);
+      particleSystem.sortParticles = true;
+      scene.add( particleSystem);
       return instance
     }
 
+    
+
     function create(n){
+      try{
       var i = firefly();
       i.position.x = Math.random() * environment.width - environment.width/2;
       i.position.y = Math.random() * environment.width - environment.width/2;
@@ -120,8 +136,10 @@ define(
       i.velocity.y = Math.random() * 2 - 1;
       i.velocity.z = Math.random() * 2 - 1;
       
-      i.mesh.position = i.position;
       onCreate && onCreate(i,n)
+      particles.vertices.push(i.position);
+      }
+    catch(e){console.error(e)}
       return i
     }
 

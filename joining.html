@@ -24,9 +24,7 @@
 
         swarm
           .onCreate(function(f,n){
-            f.mesh.material.specular = new THREE.Color("#ff0000").offsetHSL(n/100,0,0)
-            f.mesh.material.color = new THREE.Color("#ff0000").offsetHSL(n/100,0,-.1)
-            f.mesh.material.emissive = new THREE.Color("#ff0000").offsetHSL(n/100,0,-.3)
+            f.color = new THREE.Color("#ff0000").offsetHSL(n/100,0,-.1)
             f.type = n
             f.fieldOfVision = 400
           })

@@ -28,9 +28,7 @@
             var variants = 4
             f.type = n%variants
             var hue = f.type/variants
-            f.mesh.material.specular = new THREE.Color("#ff0000").offsetHSL(hue,0,0)
-            f.mesh.material.color = new THREE.Color("#ff0000").offsetHSL(hue,0,-.1)
-            f.mesh.material.emissive = new THREE.Color("#ff0000").offsetHSL(hue,0,-.3)
+            f.color = new THREE.Color("#ff0000").offsetHSL(hue,0,-.1)
             f.fieldOfVision = 200
             f.maxSpeed = 2
             f.maxSteerForce = .01

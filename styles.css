@@ -42,3 +42,9 @@ body {
 .show-direction .direction{
 	display:block;
 }
+
+canvas {
+  border: 1px solid #445566;
+border-radius: 10px;
+margin: 10px;
+}

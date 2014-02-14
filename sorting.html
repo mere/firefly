@@ -20,27 +20,25 @@
         env.flat = false
         env.mouseForce = -.5
         env.wallRepelForce = 5
-
+        var NUM_PARTICLES = 200
         swarm
           .onCreate(function(f,n){
-            f.mesh.material.specular = new THREE.Color("#ff0000").offsetHSL(n/100,0,0)
-            f.mesh.material.color = new THREE.Color("#ff0000").offsetHSL(n/100,0,-.1)
-            f.mesh.material.emissive = new THREE.Color("#ff0000").offsetHSL(n/100,0,-.3)
+            f.color = new THREE.Color("#ff0000").offsetHSL(n/NUM_PARTICLES,0,-.1)
             f.type = n
             f.fieldOfVision = 400
             f.maxSpeed = 2
           })
           .interact(function(me, you, distance){
-            var d = Math.abs((me.type%100)- (you.type%100))
+            var d = Math.abs((me.type%NUM_PARTICLES)- (you.type%NUM_PARTICLES))
       
             if (d == 0) return 1
-            if (distance< 40) return -.5
-            if (d == 1) return .5
-            if (distance< 100 && d>3) return -.1
+            if (distance< 10) return -.5
+            if (d == 1) return .1
+            if (distance< 20 && d>3) return -.01
             return 0.0001
           })
 
-          .add(99)
+          .add(NUM_PARTICLES-1)
 
       })
     </script>
