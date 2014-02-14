@@ -31,10 +31,9 @@
           .interact(function(me, you, distance){
             var d = Math.abs((me.type%NUM_PARTICLES)- (you.type%NUM_PARTICLES))
       
-            if (d == 0) return 1
             if (distance< 10) return -.5
-            if (d == 1) return .1
-            if (distance< 20 && d>3) return -.01
+            if (d == 1) return .2
+            if (distance< d*5) return -.01
             return 0.0001
           })
 

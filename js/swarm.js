@@ -92,6 +92,7 @@ define(
           var s = ( environment.width/2 + f.position.z ) / environment.width
           f.renderedColor.setHSL(hsl.h, hsl.s, hsl.l)
         }
+        else f.renderedColor.copy(f.color)
       })
       
       renderer.render( scene, camera );
@@ -109,8 +110,8 @@ define(
       //map: THREE.ImageUtils.loadTexture(
       //       "../images/particle.png"
       //)
-      blending: THREE.AdditiveBlending,
-      transparent: true
+      //blending: THREE.AdditiveBlending,
+      //transparent: true
     })
     instance.add = function(num){
       for ( var n = 0; n < num; n ++ ) {
